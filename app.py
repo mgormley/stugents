@@ -62,10 +62,13 @@ async def ask_questions(sentence: str):
     await asyncio.gather(*tasks)
 
 
-async def lecture(audio: Tuple[int, np.ndarray]):
+async def lecture(audio: Tuple[int, np.ndarray] | None):
     """Transcribe audio, split into sentences, and stream student questions."""
+    if audio is None:
+        return
     sample_rate, data = audio
     buffer = numpy_to_wav(data, sample_rate)
+    buffer.name = "audio.wav"
     transcription = await client.audio.transcriptions.create(
         model="gpt-4o-transcribe",
         file=buffer,
@@ -77,19 +80,16 @@ async def lecture(audio: Tuple[int, np.ndarray]):
         async for update in ask_questions(sentence.strip()):
             yield update
 
-def main():    
-    with gr.Blocks() as demo:
-        gr.Markdown("# Student Question Simulator")
-        audio_input = gr.Audio(sources=["microphone"], type="numpy", label="Lecture Audio")
-        with gr.Row():
-            outputs: List[gr.Textbox] = []
-            for i in range(4):
-                with gr.Column():
-                    gr.HTML("<div style='font-size:172px;text-align:center'>🧑‍🎓</div>")
-                    outputs.append(gr.Textbox(label=f"Student {i+1}", lines=3))
-        audio_input.change(lecture, inputs=audio_input, outputs=outputs)
-        
-    demo.launch()
+with gr.Blocks() as demo:
+    gr.Markdown("# Student Question Simulator")
+    audio_input = gr.Audio(sources=["microphone"], type="numpy", label="Lecture Audio")
+    with gr.Row():
+        outputs: List[gr.Textbox] = []
+        for i in range(4):
+            with gr.Column():
+                gr.HTML("<div style='font-size:48px;text-align:center'>🧑‍🎓</div>")
+                outputs.append(gr.Textbox(label=f"Student {i+1}", lines=3))
+    audio_input.change(lecture, inputs=audio_input, outputs=outputs)
 
 if __name__ == "__main__":
-    main()
+    demo.launch()
