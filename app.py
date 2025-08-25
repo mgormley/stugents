@@ -16,7 +16,6 @@ SYSTEM_PROMPT = (
 
 client = AsyncOpenAI()
 
-
 def numpy_to_wav(audio: np.ndarray, sample_rate: int) -> io.BytesIO:
     """Convert a numpy audio array into a WAV file stored in memory."""
     buffer = io.BytesIO()
@@ -80,7 +79,6 @@ async def lecture(audio: Tuple[int, np.ndarray] | None):
         yield tuple(["" for _ in range(4)])
         async for update in ask_questions(sentence.strip()):
             yield update
-
 
 with gr.Blocks() as demo:
     gr.Markdown("# Student Question Simulator")
