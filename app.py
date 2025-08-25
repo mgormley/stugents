@@ -16,7 +16,6 @@ SYSTEM_PROMPT = (
 
 client = AsyncOpenAI()
 
-
 def numpy_to_wav(audio: np.ndarray, sample_rate: int) -> io.BytesIO:
     """Convert a numpy audio array into a WAV file stored in memory."""
     buffer = io.BytesIO()
@@ -78,17 +77,19 @@ async def lecture(audio: Tuple[int, np.ndarray]):
         async for update in ask_questions(sentence.strip()):
             yield update
 
-
-with gr.Blocks() as demo:
-    gr.Markdown("# Student Question Simulator")
-    audio_input = gr.Audio(sources=["microphone"], type="numpy", label="Lecture Audio")
-    with gr.Row():
-        outputs: List[gr.Textbox] = []
-        for i in range(4):
-            with gr.Column():
-                gr.HTML("<div style='font-size:48px;text-align:center'>🧑‍🎓</div>")
-                outputs.append(gr.Textbox(label=f"Student {i+1}", lines=3))
-    audio_input.change(lecture, inputs=audio_input, outputs=outputs)
+def main():    
+    with gr.Blocks() as demo:
+        gr.Markdown("# Student Question Simulator")
+        audio_input = gr.Audio(sources=["microphone"], type="numpy", label="Lecture Audio")
+        with gr.Row():
+            outputs: List[gr.Textbox] = []
+            for i in range(4):
+                with gr.Column():
+                    gr.HTML("<div style='font-size:172px;text-align:center'>🧑‍🎓</div>")
+                    outputs.append(gr.Textbox(label=f"Student {i+1}", lines=3))
+        audio_input.change(lecture, inputs=audio_input, outputs=outputs)
+        
+    demo.launch()
 
 if __name__ == "__main__":
-    demo.launch()
+    main()
